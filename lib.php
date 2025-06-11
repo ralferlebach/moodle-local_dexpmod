@@ -64,19 +64,18 @@ function local_dexpmod_extend_settings_navigation($settingsnav, $context) {
 /**
  * Returns the activities with completion set in current course.
  *
- * @param int    $courseid   ID of the course
+ * @param int    $courseID   ID of the course
  * @param int    $config     The block instance configuration
- * @param string $forceorder An override for the course order setting
+ * @param string $forceOrder An override for the course order setting
  *
  * @return array Activities with completion settings in the course
  */
-function local_dexpmod_get_activities($courseid, $config = null, $forceorder = null)
-{
-    $modinfo = get_fast_modinfo($courseid, -1);
-    $sections = $modinfo->get_sections();
+function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?string $forceOrder = null): array {
+    $modInfo = get_fast_modinfo($courseID, -1);
+    $sections = $modInfo->get_sections();
     $activities = [];
-    foreach ($modinfo->instances as $module => $instances) {
-        $modulename = get_string('pluginname', $module);
+    foreach ($modInfo->instances as $module => $instances) {
+        $moduleName = get_string('pluginname', $module);
         foreach ($instances as $index => $cm) {
             if (
                 $cm->completion != COMPLETION_TRACKING_NONE && (
@@ -88,7 +87,7 @@ function local_dexpmod_get_activities($courseid, $config = null, $forceorder = n
             ) {
                 $activities[] = [
                     'type' => $module,
-                    'modulename' => $modulename,
+                    'modulename' => $moduleName,
                     'id' => $cm->id,
                     'instance' => $cm->instance,
                     'name' => format_string($cm->name),
@@ -121,14 +120,13 @@ function local_dexpmod_get_activities($courseid, $config = null, $forceorder = n
  *
  * @return array table of activities
  */
-function move_activities($courseID, $data)
-{
+function move_activities($courseID, $data):array {
     global $DB;
     //Get all activities in the course
     $activities = local_dexpmod_get_activities($courseID, null, 'orderbycourse');
-    $add_duration = $data->timeduration;
-    $sql_params = ['course' => $courseID];
-    $expected_array = $DB->get_records('course_modules', $sql_params);
+    $addDuration = $data->timeduration;
+    $sqlParams = ['course' => $courseID];
+    $expected_array = $DB->get_records('course_modules', $sqlParams);
     $table = new html_table();
     $table->head = ['Aktivität', 'Abschlusstermin'];
 
@@ -139,40 +137,40 @@ function move_activities($courseID, $data)
             // Check if all activities should be moved
             if ($data->config_activitiesincluded == 'allactivites') {// Move all activities contained in the course
                 if ($data->datedependence) {
-                    $record_params = ['id' => $activity['id']];
-                    $expected_old = $DB->get_record('course_modules', $record_params, $fields = '*');
+                    $recordParams = ['id' => $activity['id']];
+                    $expectedOld = $DB->get_record('course_modules', $recordParams, $fields = '*');
 
-                    if ($data->date_min <= $expected_old->completionexpected && $expected_old->completionexpected <= $data->date_max) {
-                        $newdate = $expected_old->completionexpected + $add_duration;
-                        $update_params = ['id' => $activity['id'], 'completionexpected' => $newdate];
-                        $DB->update_record('course_modules', $update_params);
+                    if ($data->date_min <= $expectedOld->completionexpected && $expectedOld->completionexpected <= $data->date_max) {
+                        $newdate = $expectedOld->completionexpected + $addDuration;
+                        $updateParams = ['id' => $activity['id'], 'completionexpected' => $newdate];
+                        $DB->update_record('course_modules', $updateParams);
                         // To ensure a valid date read expextec completion from DB
-                        $replaced_date = $DB->get_record('course_modules', $record_params, $fields = '*');
+                        $replaced_date = $DB->get_record('course_modules', $recordParams, $fields = '*');
 
                         //  echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
                         $table->data[] = [$activity['name'], userdate($replaced_date->completionexpected)];
                     }
                 } else {
-                    $record_params = ['id' => $activity['id']];
-                    $expected_old = $DB->get_record('course_modules', $record_params, $fields = '*');
-                    $newdate = $expected_old->completionexpected + $add_duration;
-                    $update_params = ['id' => $activity['id'], 'completionexpected' => $newdate];
-                    $DB->update_record('course_modules', $update_params);
+                    $recordParams = ['id' => $activity['id']];
+                    $expectedOld = $DB->get_record('course_modules', $recordParams, $fields = '*');
+                    $newdate = $expectedOld->completionexpected + $addDuration;
+                    $updateParams = ['id' => $activity['id'], 'completionexpected' => $newdate];
+                    $DB->update_record('course_modules', $updateParams);
                     // To ensure a valid date read expextec completion from DB
-                    $replaced_date = $DB->get_record('course_modules', $record_params, $fields = '*');
+                    $replaced_date = $DB->get_record('course_modules', $recordParams, $fields = '*');
                     //  echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
                     $table->data[] = [$activity['name'], userdate($replaced_date->completionexpected)];
                 }
             } else {
                 // All Activities chosen by the user
                 if (in_array($activity['id'], $data->selectactivities)) {
-                    $record_params = ['id' => $activity['id']];
-                    $expected_old = $DB->get_record('course_modules', $record_params, $fields = '*');
-                    $newdate = $expected_old->completionexpected + $add_duration;
-                    $update_params = ['id' => $activity['id'], 'completionexpected' => $newdate];
-                    $DB->update_record('course_modules', $update_params);
+                    $recordParams = ['id' => $activity['id']];
+                    $expectedOld = $DB->get_record('course_modules', $recordParams, $fields = '*');
+                    $newdate = $expectedOld->completionexpected + $addDuration;
+                    $updateParams = ['id' => $activity['id'], 'completionexpected' => $newdate];
+                    $DB->update_record('course_modules', $updateParams);
                     // To ensure a valid date read expextec completion from DB
-                    $replaced_date = $DB->get_record('course_modules', $record_params, $fields = '*');
+                    $replaced_date = $DB->get_record('course_modules', $recordParams, $fields = '*');
 
                     // echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
                     $table->data[] = [$activity['name'], userdate($replaced_date->completionexpected)];
@@ -187,10 +185,13 @@ function move_activities($courseID, $data)
 /**
  * Returns the activities with completion set in current course.
  *
- * @return array table of activities
+ * @param int courseID      Course ID
+ * @param int dateMin       Minimum date
+ * @param int dateMax       Maximum date
+ *
+ * @return array            Table of activities
  */
-function list_all_activities($courseID, $datemin=null, $datemax=null)
-{
+function list_all_activities(int $courseID, ?int $dateMin = null, ?int $dateMax = bnull):array {
     global $DB;
     //Standard values without submitting the form
 
@@ -198,29 +199,29 @@ function list_all_activities($courseID, $datemin=null, $datemax=null)
     $table = new html_table();
     $table->head = [get_string('section', 'local_dexpmod'), get_string('activity', 'local_dexpmod'), get_string('duedate', 'local_dexpmod')];
     // echo $OUTPUT->heading('Kursinformationen: '.get_course($courseID)->fullname  ,2);
-    $sql_params = ['course' => $courseID];
+    $sqlParams = ['course' => $courseID];
     foreach ($activities as $index => $activity) {
         // // Show only visible acitivities!
         if ($activity['visible'] == '0') {
             continue;
         }
         if ($activity['expected'] > 0) {
-            if ($datemin)   {
-                if($activity['expected'] >= $datemin && $activity['expected']<= $datemax)   {
-                    $record_params = ['id' => $activity['id']];
-                     $date_expected = $DB->get_record('course_modules', $record_params, $fields = '*');
+            if ($dateMin)   {
+                if($activity['expected'] >= $dateMin && $activity['expected']<= $dateMax)   {
+                    $recordParams = ['id' => $activity['id']];
+                     $dateExpected = $DB->get_record('course_modules', $recordParams, $fields = '*');
                     // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
-                    $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $date_expected->completionexpected)];
+                    $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateExpected->completionexpected)];
                 } 
             else {
                 continue;
             }
             }
             else{
-            $record_params = ['id' => $activity['id']];
-            $date_expected = $DB->get_record('course_modules', $record_params, $fields = '*');
+            $recordParams = ['id' => $activity['id']];
+            $dateExpected = $DB->get_record('course_modules', $recordParams, $fields = '*');
             // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
-            $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $date_expected->completionexpected)];
+            $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateExpected->completionexpected)];
             }
             
         }
