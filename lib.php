@@ -22,7 +22,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// defined('MOODLE_INTERNAL') || die();
 /**
  * Extends the navigation.
  *
@@ -104,7 +103,7 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
         }
     }
 
-    // // Sort by first value in each element, which is time due.
+    // Sort by first value in each element, which is time due.
     // if ($forceorder == 'orderbycourse' || ($config && $config->orderby == 'orderbycourse')) {
     //     usort($activities, 'block_completion_progress_compare_events');
     // } else {
@@ -122,11 +121,11 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
  */
 function move_activities($courseID, $data):array {
     global $DB;
-    //Get all activities in the course
+    //Get all activities in the course.
     $activities = local_dexpmod_get_activities($courseID, null, 'orderbycourse');
-    $addDuration = $data->timeduration;
-    $sqlParams = ['course' => $courseID];
-    $expected_array = $DB->get_records('course_modules', $sqlParams);
+    $addduration = $data->timeduration;
+    $sqlparams = ['course' => $courseID];
+    $expectedarray = $DB->get_records('course_modules', $sqlparams);
     $table = new html_table();
     $table->head = ['Aktivität', 'Abschlusstermin'];
 
@@ -134,46 +133,47 @@ function move_activities($courseID, $data):array {
         if ($activity['expected'] > 0) {
             //Activities with expected completion
 
-            // Check if all activities should be moved
-            if ($data->config_activitiesincluded == 'allactivites') {// Move all activities contained in the course
+            // Check if all activities should be moved.
+            if ($data->config_activitiesincluded == 'allactivites') {
+                // Move all activities contained in the course.
                 if ($data->datedependence) {
-                    $recordParams = ['id' => $activity['id']];
-                    $expectedOld = $DB->get_record('course_modules', $recordParams, $fields = '*');
+                    $recordparams = ['id' => $activity['id']];
+                    $expectedold = $DB->get_record('course_modules', $recordparams, $fields = '*');
 
-                    if ($data->date_min <= $expectedOld->completionexpected && $expectedOld->completionexpected <= $data->date_max) {
-                        $newdate = $expectedOld->completionexpected + $addDuration;
-                        $updateParams = ['id' => $activity['id'], 'completionexpected' => $newdate];
-                        $DB->update_record('course_modules', $updateParams);
-                        // To ensure a valid date read expextec completion from DB
-                        $replaced_date = $DB->get_record('course_modules', $recordParams, $fields = '*');
+                    if ($data->date_min <= $expectedold->completionexpected && $expectedold->completionexpected <= $data->date_max) {
+                        $newdate = $expectedold->completionexpected + $addduration;
+                        $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
+                        $DB->update_record('course_modules', $updateparams);
 
-                        //  echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
-                        $table->data[] = [$activity['name'], userdate($replaced_date->completionexpected)];
+                        // To ensure a valid date read expexted completion from DB.
+                        $replaceddate = $DB->get_record('course_modules', $recordparams, $fields = '*');
+
+                        $table->data[] = [$activity['name'], userdate($replaceddate->completionexpected)];
                     }
                 } else {
-                    $recordParams = ['id' => $activity['id']];
-                    $expectedOld = $DB->get_record('course_modules', $recordParams, $fields = '*');
-                    $newdate = $expectedOld->completionexpected + $addDuration;
-                    $updateParams = ['id' => $activity['id'], 'completionexpected' => $newdate];
-                    $DB->update_record('course_modules', $updateParams);
+                    $recordparams = ['id' => $activity['id']];
+                    $expectedold = $DB->get_record('course_modules', $recordparams, $fields = '*');
+                    $newdate = $expectedold->completionexpected + $addduration;
+                    $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
+                    $DB->update_record('course_modules', $updateparams);
                     // To ensure a valid date read expextec completion from DB
-                    $replaced_date = $DB->get_record('course_modules', $recordParams, $fields = '*');
+                    $replaceddate = $DB->get_record('course_modules', $recordparams, $fields = '*');
                     //  echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
-                    $table->data[] = [$activity['name'], userdate($replaced_date->completionexpected)];
+                    $table->data[] = [$activity['name'], userdate($replaceddate->completionexpected)];
                 }
             } else {
                 // All Activities chosen by the user
                 if (in_array($activity['id'], $data->selectactivities)) {
-                    $recordParams = ['id' => $activity['id']];
-                    $expectedOld = $DB->get_record('course_modules', $recordParams, $fields = '*');
-                    $newdate = $expectedOld->completionexpected + $addDuration;
-                    $updateParams = ['id' => $activity['id'], 'completionexpected' => $newdate];
-                    $DB->update_record('course_modules', $updateParams);
+                    $recordparams = ['id' => $activity['id']];
+                    $expectedold = $DB->get_record('course_modules', $recordparams, $fields = '*');
+                    $newdate = $expectedold->completionexpected + $addduration;
+                    $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
+                    $DB->update_record('course_modules', $updateparams);
                     // To ensure a valid date read expextec completion from DB
-                    $replaced_date = $DB->get_record('course_modules', $recordParams, $fields = '*');
+                    $replaceddate = $DB->get_record('course_modules', $recordparams, $fields = '*');
 
                     // echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
-                    $table->data[] = [$activity['name'], userdate($replaced_date->completionexpected)];
+                    $table->data[] = [$activity['name'], userdate($replaceddate->completionexpected)];
                 }
             }
         }
