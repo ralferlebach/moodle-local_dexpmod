@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local plugin "DexpMod" - lib
+ * Local plugin "DexpMod" - lib.php
  * *
  * @package     local_dexpmod
  * @copyright   2022 Alexander Dominicus, Bochum University of Applied Science <alexander.dominicus@hs-bochum.de>
