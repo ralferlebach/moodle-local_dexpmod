@@ -22,7 +22,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 $string['pluginname'] = 'addbe';
 $string['course_link'] = 'addbe'; 
 $string['dexpmod:movedates'] = 'move dates';
