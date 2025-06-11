@@ -23,7 +23,7 @@
  */
 
 $string['pluginname'] = 'addbe';
-$string['course_link'] = 'addbe'; 
+$string['course_link'] = 'addbe';
 $string['dexpmod:movedates'] = 'move dates';
 $string['semester_begin'] = 'Semester Start';
 $string['finish'] = 'move dates!';
@@ -33,9 +33,9 @@ $string['duedate'] = 'duedate';
 $string['chageduedates'] = 'check your selection!';
 $string['backtocourse'] = 'Back to course!';
 $string['headline'] = 'Move your activity dates in bulk!';
-$string['info'] = '<p>In the table below you will find all activities of the course <i>{$a->course}</i> where an activity completion date is enabled.</p> 
-<p>You can move all listed activities by selecting a time intervall 
-and pressing the submit button. By enabling the activity date checkbox you can chose upper and lower bounds of moved acitivities.</p> 
+$string['info'] = '<p>In the table below you will find all activities of the course <i>{$a->course}</i> where an activity completion date is enabled.</p>
+<p>You can move all listed activities by selecting a time intervall
+and pressing the submit button. By enabling the activity date checkbox you can chose upper and lower bounds of moved acitivities.</p>
 I.e. if you want to move all activities with expected date in October 2021 you can chose upper and lower dates equal to <p> <i> {$a->datemin} and {$a->datemax}. </i> </p>
 For moving only selected acitites choose "selected activies only". Then you can select/unselect all activies which you want to move manually. ';
 $string['date_min'] = 'date min';

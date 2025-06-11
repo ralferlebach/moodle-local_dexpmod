@@ -212,7 +212,7 @@ function list_all_activities(int $courseID, ?int $dateMin = null, ?int $dateMax 
                      $dateExpected = $DB->get_record('course_modules', $recordParams, $fields = '*');
                     // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
                     $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateExpected->completionexpected)];
-                } 
+                }
             else {
                 continue;
             }
@@ -223,7 +223,7 @@ function list_all_activities(int $courseID, ?int $dateMin = null, ?int $dateMax 
             // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
             $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateExpected->completionexpected)];
             }
-            
+
         }
     }
 

@@ -50,7 +50,7 @@ class dexpmod_form extends moodleform
             $mform->setType($name, PARAM_RAW);
         }
         $now = new DateTime('now', core_date::get_server_timezone_object());
-      
+
         // $mform->addElement('static', '', '', get_string('headline', 'local_dexpmod'));
         // $mform->addElement('static', '', '', get_string('info', 'local_dexpmod', $a));
         $mform->addElement('duration', 'timeduration', 'Intervall');
@@ -89,13 +89,13 @@ class dexpmod_form extends moodleform
             $mform->setDefault('config_activitiesincluded', 'selectedactivities');
             $mform->setDefault('datedependence', 1);
             $mform->setDefault('date_min', $this->_customdata['datemin']);
-            $mform->setDefault('date_max', $this->_customdata['datemax']);   
+            $mform->setDefault('date_max', $this->_customdata['datemax']);
         }
         else    {
             $mform->setDefault('config_activitiesincluded', 'allactivites');
             $mform->setDefault('datedependence', 0);
             $mform->hideif('selectactivities', 'datedependence', 'eq', '1');
-            
+
         }
 
         // Selected activities by the user
@@ -116,7 +116,7 @@ class dexpmod_form extends moodleform
                     $date_expected = $DB->get_record('course_modules', $record_params, $fields = '*');
                     $activitiestoinclude[$activity['id']] = $activity['section'].': '.$activity['name'].' '.date('d.m.y-H:i', $date_expected->completionexpected);
                 }
-                
+
             }
         }
         $mform->addElement('select', 'selectactivities', 'select activities', $activitiestoinclude);

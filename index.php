@@ -73,7 +73,7 @@ if ($data = $mform->get_data()) {
         $filterparams = ['id' => $courseID ,'datemin'=> $data->date_min, 'datemax'=>$data->date_max];
         redirect(new moodle_url('/local/dexpmod/index.php', $filterparams));
     }
-    
+
 }
 
 // Check if we have activities with duedate
@@ -108,7 +108,7 @@ if(count($duedateactivities)>0) {
         echo html_writer::tag('h3',"List of all activities");
         echo html_writer::table($table);
     }
-     
+
         }
 else    {
     echo html_writer::tag('h3',"No activity duedates found. Please create activities with duedate!");
