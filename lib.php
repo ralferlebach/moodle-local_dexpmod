@@ -116,8 +116,8 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
 /**
  * Moves the chosen activities and returns a list of these activities.
  *
- * @param int       $courseid
- * @param array     $data  form data
+ * @param int $courseid
+ * @param array $data
  *
  * @return array table of activities
  */
@@ -159,13 +159,13 @@ function move_activities(int $courseid, array $data): array {
                     $newdate = $expectedold->completionexpected + $addduration;
                     $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
                     $DB->update_record('course_modules', $updateparams);
-                    // To ensure a valid date read expextec completion from DB
+                    // To ensure a valid date read expextec completion from DB.
                     $replaceddate = $DB->get_record('course_modules', $recordparams, $fields = '*');
                     //  echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
                     $table->data[] = [$activity['name'], userdate($replaceddate->completionexpected)];
                 }
             } else {
-                // All Activities chosen by the user
+                // All Activities chosen by the user.
                 if (in_array($activity['id'], $data->selectactivities)) {
                     $recordparams = ['id' => $activity['id']];
                     $expectedold = $DB->get_record('course_modules', $recordparams, $fields = '*');
@@ -188,29 +188,29 @@ function move_activities(int $courseid, array $data): array {
 /**
  * Returns the activities with completion set in current course.
  *
- * @param int courseID      Course ID
- * @param ?int dateMin       Minimum date
- * @param ?int dateMax       Maximum date
+ * @param int $courseid
+ * @param ?int $datemin
+ * @param ?int $datemax
  *
  * @return array            Table of activities
  */
-function list_all_activities(int $courseID, ?int $dateMin = null, ?int $dateMax = bnull): array {
+function list_all_activities(int $courseid, ?int $datemin = null, ?int $datemax = null): array {
     global $DB;
     //Standard values without submitting the form
 
-    $activities = local_dexpmod_get_activities($courseID, null, 'orderbycourse');
+    $activities = local_dexpmod_get_activities($courseid, null, 'orderbycourse');
     $table = new html_table();
     $table->head = [get_string('section', 'local_dexpmod'), get_string('activity', 'local_dexpmod'), get_string('duedate', 'local_dexpmod')];
     // echo $OUTPUT->heading('Kursinformationen: '.get_course($courseID)->fullname  ,2);
-    $sqlParams = ['course' => $courseID];
+    $sqlParams = ['course' => $courseid];
     foreach ($activities as $index => $activity) {
         // // Show only visible acitivities!
         if ($activity['visible'] == '0') {
             continue;
         }
         if ($activity['expected'] > 0) {
-            if ($dateMin)   {
-                if($activity['expected'] >= $dateMin && $activity['expected']<= $dateMax)   {
+            if ($datemin)   {
+                if($activity['expected'] >= $datemin && $activity['expected']<= $datemax)   {
                     $recordParams = ['id' => $activity['id']];
                      $dateExpected = $DB->get_record('course_modules', $recordParams, $fields = '*');
                     // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
