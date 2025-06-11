@@ -30,16 +30,18 @@ require_once 'edit_form.php';
  require_login();
 
 global $CFG, $DB, $PAGE;
-$courseID = required_param('id', PARAM_INT);
-$datemin = optional_param('datemin',0, PARAM_INT);
-$datemax = optional_param('datemax',0, PARAM_INT);
-$reviewselection = optional_param('reviewselection',0, PARAM_INT);
-$course = $DB->get_record('course', ['id' => $courseID]);
+
+$courseid = required_param('id', PARAM_INT);
+$datemin = optional_param('datemin', 0, PARAM_INT);
+$datemax = optional_param('datemax', 0, PARAM_INT);
+$reviewselection = optional_param('reviewselection', 0, PARAM_INT);
+$course = $DB->get_record('course', ['id' => $courseid]);
 $coursecontext = context_course::instance($course->id);
 
-$currentparams = ['id' => $courseID];
+$currentparams = ['id' => $courseid];
 $url = new moodle_url('/local/dexpmod/index.php', $currentparams);
 $PAGE->set_url($url);
+
 if (!has_capability('local/dexpmod:movedates', $coursecontext)) {
     $url_back = new moodle_url('/my');
     redirect($url_back, 'sie haben nicht die passenden Berechtigungen!', null, \core\output\notification::NOTIFY_ERROR);
@@ -47,70 +49,66 @@ if (!has_capability('local/dexpmod:movedates', $coursecontext)) {
 
 // Set page context.
 $PAGE->set_context(context_system::instance());
+
 // Set page layout.
 $PAGE->set_pagelayout('standard');
-// Set page layout.
 
 $PAGE->set_title($SITE->fullname.': '.'DexpMod');
 $PAGE->set_heading($SITE->fullname);
-// $PAGE->set_url(new moodle_url('/local/dexmod/index.php'));
 $PAGE->navbar->ignore_active(true);
-// $PAGE->navbar->add("Dexpmod", new moodle_url('/local/dexpmod/index.php'));
 $PAGE->navbar->add('addbe', new moodle_url($url));
 $PAGE->set_pagelayout('admin');
 
-$mform = new dexpmod_form(null, ['courseid' => $courseID,'datemin' => $datemin,'datemax' => $datemax, 'url' => $url]);
-//display the form
+$mform = new dexpmod_form(null, ['courseid' => $courseid,'datemin' => $datemin,'datemax' => $datemax, 'url' => $url]);
 
-// $mform->set_data((object)$currentparams);
+// Display the form.
 if ($data = $mform->get_data()) {
-
-    if(count($data->selectactivities)>0 || $data->config_activitiesincluded == 'allactivites') {
-        move_activities($courseID, $data);
+    if (count($data->selectactivities) > 0 || $data->config_activitiesincluded == 'allactivites') {
+        move_activities($courseid, $data);
         redirect(new moodle_url('/local/dexpmod/index.php', $currentparams), "Daten wurden geändert!");
-    }
-    elseif ($data->datedependence )  {
-        $filterparams = ['id' => $courseID ,'datemin'=> $data->date_min, 'datemax'=>$data->date_max];
+    } else if ($data->datedependence )  {
+        $filterparams = [
+            'id' => $courseid ,
+            'datemin' => $data->date_min,
+            'datemax' =>$data->date_max,
+            ];
         redirect(new moodle_url('/local/dexpmod/index.php', $filterparams));
     }
-
 }
 
 // Check if we have activities with duedate
-$activities = local_dexpmod_get_activities($courseID, null, 'orderbycourse');
+$activities = local_dexpmod_get_activities($courseid, null, 'orderbycourse');
 $duedateactivities = array();
-foreach($activities as $activity)   {
-    if($activity['expected'] > 0)   {
-        $duedateactivities[]=$activity['id'];
+foreach($activities as $activity) {
+    if($activity['expected'] > 0) {
+        $duedateactivities[] = $activity['id'];
     }
 }
 echo $OUTPUT->header();
+
 $a = new stdClass();
-$a->course = get_course($courseID)->fullname;
+$a->course = get_course($courseid)->fullname;
 $a->datemin = userdate(1633039200);
 $a->datemax = userdate(1635721140);
-if(count($duedateactivities)>0) {
-    echo html_writer::tag('h2',get_string('headline', 'local_dexpmod'));
-    echo html_writer::tag('p',get_string('info', 'local_dexpmod',$a));
+if (count($duedateactivities) > 0) {
+    echo html_writer::tag('h2', get_string('headline', 'local_dexpmod'));
+    echo html_writer::tag('p', get_string('info', 'local_dexpmod', $a));
     $mform->display();
 }
-$backurl = new moodle_url('/course/view.php', ['id' => $courseID]);
+$backurl = new moodle_url('/course/view.php', ['id' => $courseid]);
 echo $OUTPUT->single_button($backurl, get_string('backtocourse', 'local_dexpmod'), 'get');
 
-if(count($duedateactivities)>0) {
-    if($datemin) {
-        $table = list_all_activities($courseID,$datemin,$datemax);
-        echo html_writer::tag('h3',"List of filtered activities");
+if (count($duedateactivities) > 0) {
+    if ($datemin) {
+        $table = list_all_activities($courseid, $datemin, $datemax);
+        echo html_writer::tag('h3', "List of filtered activities");
+        echo html_writer::table($table);
+    } else {
+        $table = list_all_activities($courseid);
+        echo html_writer::tag('h3', "List of all activities");
         echo html_writer::table($table);
     }
-    else {
-        $table = list_all_activities($courseID);
-        echo html_writer::tag('h3',"List of all activities");
-        echo html_writer::table($table);
-    }
-
-        }
-else    {
-    echo html_writer::tag('h3',"No activity duedates found. Please create activities with duedate!");
+} else {
+    echo html_writer::tag('h3', "No activity duedates found. Please create activities with duedate!");
 }
 echo $OUTPUT->footer();

@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-        // Whether or not the user can move dates
-        'local/dexpmod:movedates' => array(
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_COURSE,
-        ),
-);
+$capabilities = [
+        // Whether or not the user can move dates.
+        'local/dexpmod:movedates' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+        ],
+];

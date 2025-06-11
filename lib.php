@@ -34,7 +34,7 @@ function local_dexpmod_extend_settings_navigation(settings_navigation $settingsn
     global $PAGE;
 
     // Only add this settings item on non-site course pages.
-    if (!$PAGE->course or $PAGE->course->id == 1) {
+    if (!$PAGE->course || $PAGE->course->id == 1) {
         return;
     }
     // Only let users with the appropriate capability see this settings item.
@@ -63,18 +63,18 @@ function local_dexpmod_extend_settings_navigation(settings_navigation $settingsn
 /**
  * Returns the activities with completion set in current course.
  *
- * @param int       $courseID   ID of the course
+ * @param int       $courseid   ID of the course
  * @param ?int      $config     The block instance configuration
- * @param ?string   $forceOrder An override for the course order setting
+ * @param ?string   $forceorder An override for the course order setting
  *
  * @return array Activities with completion settings in the course
  */
-function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?string $forceOrder = null): array {
-    $modInfo = get_fast_modinfo($courseID, -1);
-    $sections = $modInfo->get_sections();
+function local_dexpmod_get_activities(int $courseid, ?int $config = null, ?string $forceorder = null): array {
+    $modinfo = get_fast_modinfo($courseid, -1);
+    $sections = $modinfo->get_sections();
     $activities = [];
-    foreach ($modInfo->instances as $module => $instances) {
-        $moduleName = get_string('pluginname', $module);
+    foreach ($modinfo->instances as $module => $instances) {
+        $modname = get_string('pluginname', $module);
         foreach ($instances as $index => $cm) {
             if (
                 $cm->completion != COMPLETION_TRACKING_NONE && (
@@ -86,7 +86,7 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
             ) {
                 $activities[] = [
                     'type' => $module,
-                    'modulename' => $moduleName,
+                    'modulename' => $modname,
                     'id' => $cm->id,
                     'instance' => $cm->instance,
                     'name' => format_string($cm->name),
@@ -104,11 +104,12 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
     }
 
     // Sort by first value in each element, which is time due.
-    // if ($forceorder == 'orderbycourse' || ($config && $config->orderby == 'orderbycourse')) {
-    //     usort($activities, 'block_completion_progress_compare_events');
-    // } else {
-    //     usort($activities, 'block_completion_progress_compare_times');
-    // }
+    if ($forceorder == 'orderbycourse' || ($config && $config->orderby == 'orderbycourse')) {
+         usort($activities, 'block_completion_progress_compare_events');
+    } else {
+         usort($activities, 'block_completion_progress_compare_times');
+    }
+    // NOTE: This may be deleted again.
 
     return $activities;
 }
@@ -124,7 +125,7 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
 function move_activities(int $courseid, array $data): array {
     global $DB;
 
-    //Get all activities in the course.
+    // Get all activities in the course.
     $activities = local_dexpmod_get_activities($courseid, null, 'orderbycourse');
     $addduration = $data->timeduration;
     $sqlparams = ['course' => $courseid];
@@ -134,7 +135,7 @@ function move_activities(int $courseid, array $data): array {
 
     foreach ($activities as $index => $activity) {
         if ($activity['expected'] > 0) {
-            //Activities with expected completion
+            // Activities with expected completion.
 
             // Check if all activities should be moved.
             if ($data->config_activitiesincluded == 'allactivites') {
@@ -143,7 +144,8 @@ function move_activities(int $courseid, array $data): array {
                     $recordparams = ['id' => $activity['id']];
                     $expectedold = $DB->get_record('course_modules', $recordparams, $fields = '*');
 
-                    if ($data->date_min <= $expectedold->completionexpected && $expectedold->completionexpected <= $data->date_max) {
+                    if ($data->date_min <= $expectedold->completionexpected &&
+                        $expectedold->completionexpected <= $data->date_max) {
                         $newdate = $expectedold->completionexpected + $addduration;
                         $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
                         $DB->update_record('course_modules', $updateparams);
@@ -159,9 +161,8 @@ function move_activities(int $courseid, array $data): array {
                     $newdate = $expectedold->completionexpected + $addduration;
                     $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
                     $DB->update_record('course_modules', $updateparams);
-                    // To ensure a valid date read expextec completion from DB.
+                    // To ensure a valid date read expexted completion from DB.
                     $replaceddate = $DB->get_record('course_modules', $recordparams, $fields = '*');
-                    //  echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
                     $table->data[] = [$activity['name'], userdate($replaceddate->completionexpected)];
                 }
             } else {
@@ -172,16 +173,13 @@ function move_activities(int $courseid, array $data): array {
                     $newdate = $expectedold->completionexpected + $addduration;
                     $updateparams = ['id' => $activity['id'], 'completionexpected' => $newdate];
                     $DB->update_record('course_modules', $updateparams);
-                    // To ensure a valid date read expextec completion from DB
+                    // To ensure a valid date read expextec completion from DB.
                     $replaceddate = $DB->get_record('course_modules', $recordparams, $fields = '*');
-
-                    // echo $OUTPUT->heading($activity['name']." -> ". userdate( $replaced_date->completionexpected),5);
                     $table->data[] = [$activity['name'], userdate($replaceddate->completionexpected)];
                 }
             }
         }
     }
-
     return $table;
 }
 
@@ -196,39 +194,38 @@ function move_activities(int $courseid, array $data): array {
  */
 function list_all_activities(int $courseid, ?int $datemin = null, ?int $datemax = null): array {
     global $DB;
-    //Standard values without submitting the form
 
+    // Standard values without submitting the form.
     $activities = local_dexpmod_get_activities($courseid, null, 'orderbycourse');
     $table = new html_table();
-    $table->head = [get_string('section', 'local_dexpmod'), get_string('activity', 'local_dexpmod'), get_string('duedate', 'local_dexpmod')];
-    // echo $OUTPUT->heading('Kursinformationen: '.get_course($courseID)->fullname  ,2);
-    $sqlParams = ['course' => $courseid];
+    $table->head = [
+        get_string('section', 'local_dexpmod'),
+        get_string('activity', 'local_dexpmod'),
+        get_string('duedate', 'local_dexpmod'),
+        ];
+
     foreach ($activities as $index => $activity) {
-        // // Show only visible acitivities!
+        // Show only visible acitivities!
         if ($activity['visible'] == '0') {
             continue;
         }
         if ($activity['expected'] > 0) {
-            if ($datemin)   {
-                if($activity['expected'] >= $datemin && $activity['expected']<= $datemax)   {
-                    $recordParams = ['id' => $activity['id']];
-                     $dateExpected = $DB->get_record('course_modules', $recordParams, $fields = '*');
-                    // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
-                    $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateExpected->completionexpected)];
+            if ($datemin) {
+                if($activity['expected'] >= $datemin && $activity['expected'] <= $datemax) {
+                    $recordparams = ['id' => $activity['id']];
+                    $dateexpected = $DB->get_record('course_modules', $recordparams, "*");
+                    $table->data[] = [
+                        $activity['section'],
+                        $activity['name'],
+                        date('d.m.y-H:i', $dateexpected->completionexpected),
+                        ];
                 }
-            else {
-                continue;
+            } else {
+                $recordparams = ['id' => $activity['id']];
+                $dateexpected = $DB->get_record('course_modules', $recordparams, $fields = '*');
+                $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateexpected->completionexpected)];
             }
-            }
-            else{
-            $recordParams = ['id' => $activity['id']];
-            $dateExpected = $DB->get_record('course_modules', $recordParams, $fields = '*');
-            // echo $OUTPUT->heading("&nbsp"."&#8226". $activity['name'].": ".userdate($date_expected->completionexpected) ,5);
-            $table->data[] = [$activity['section'], $activity['name'], date('d.m.y-H:i', $dateExpected->completionexpected)];
-            }
-
         }
     }
-
     return $table;
 }

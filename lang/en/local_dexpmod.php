@@ -47,6 +47,6 @@ $string['info'] = '<p>In the table below you will find all activities of the cou
     <p>For moving only selected acitites choose "selected activies only". Then you can select/unselect all activies
     which you want to move manually.</p>';
 $string['pluginname'] = 'Date Expiration Modificator';
-$string['refresh'] ='<a href="index.php?id={$a->courseid}">refresh the page!</a>';
+$string['refresh'] = '<a href="index.php?id={$a->courseid}">refresh the page!</a>';
 $string['section'] = 'section';
 $string['semester_begin'] = 'Semester Start';
