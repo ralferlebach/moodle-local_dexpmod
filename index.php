@@ -22,10 +22,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once __DIR__.'/../../config.php';
-require_once $CFG->libdir.'/adminlib.php';
-require_once 'lib.php';
-require_once 'edit_form.php';
+require_once(__DIR__.'/../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
+require_once('lib.php');
+require_once('edit_form.php');
 
  require_login();
 
@@ -43,8 +43,8 @@ $url = new moodle_url('/local/dexpmod/index.php', $currentparams);
 $PAGE->set_url($url);
 
 if (!has_capability('local/dexpmod:movedates', $coursecontext)) {
-    $url_back = new moodle_url('/my');
-    redirect($url_back, 'sie haben nicht die passenden Berechtigungen!', null, \core\output\notification::NOTIFY_ERROR);
+    $urlback = new moodle_url('/my');
+    redirect($urlback, 'sie haben nicht die passenden Berechtigungen!', null, \core\output\notification::NOTIFY_ERROR);
 }
 
 // Set page context.
@@ -59,28 +59,34 @@ $PAGE->navbar->ignore_active(true);
 $PAGE->navbar->add('addbe', new moodle_url($url));
 $PAGE->set_pagelayout('admin');
 
-$mform = new dexpmod_form(null, ['courseid' => $courseid,'datemin' => $datemin,'datemax' => $datemax, 'url' => $url]);
+$mform = new dexpmod_form(null, [
+    'courseid' => $courseid,
+    'datemin' => $datemin,
+    'datemax' => $datemax,
+    'url' => $url,
+    ]);
 
 // Display the form.
 if ($data = $mform->get_data()) {
     if (count($data->selectactivities) > 0 || $data->config_activitiesincluded == 'allactivites') {
         move_activities($courseid, $data);
         redirect(new moodle_url('/local/dexpmod/index.php', $currentparams), "Daten wurden geändert!");
-    } else if ($data->datedependence )  {
+    } else if ($data->datedependence ) {
         $filterparams = [
             'id' => $courseid ,
             'datemin' => $data->date_min,
-            'datemax' =>$data->date_max,
+            'datemax' => $data->date_max,
             ];
         redirect(new moodle_url('/local/dexpmod/index.php', $filterparams));
     }
 }
 
-// Check if we have activities with duedate
+// Check if we have activities with duedate.
 $activities = local_dexpmod_get_activities($courseid, null, 'orderbycourse');
-$duedateactivities = array();
-foreach($activities as $activity) {
-    if($activity['expected'] > 0) {
+$duedateactivities = [];
+
+foreach ($activities as $activity) {
+    if ($activity['expected'] > 0) {
         $duedateactivities[] = $activity['id'];
     }
 }

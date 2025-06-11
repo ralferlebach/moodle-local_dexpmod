@@ -183,15 +183,7 @@ function move_activities(int $courseid, array $data): array {
     return $table;
 }
 
-/**
- * Returns the activities with completion set in current course.
- *
- * @param int $courseid
- * @param ?int $datemin
- * @param ?int $datemax
- *
- * @return array            Table of activities
- */
+c
 function list_all_activities(int $courseid, ?int $datemin = null, ?int $datemax = null): array {
     global $DB;
 
@@ -211,7 +203,7 @@ function list_all_activities(int $courseid, ?int $datemin = null, ?int $datemax 
         }
         if ($activity['expected'] > 0) {
             if ($datemin) {
-                if($activity['expected'] >= $datemin && $activity['expected'] <= $datemax) {
+                if ($activity['expected'] >= $datemin && $activity['expected'] <= $datemax) {
                     $recordparams = ['id' => $activity['id']];
                     $dateexpected = $DB->get_record('course_modules', $recordparams, "*");
                     $table->data[] = [
