@@ -183,6 +183,15 @@ function move_activities(int $courseid, array $data): array {
     return $table;
 }
 
+/**
+ * Lists all activities.
+ *
+ * @param int $courseid
+ * @param ?int $datemin
+ * @param ?int $datemax
+ *
+ * @return array table of activities
+ */
 function list_all_activities(int $courseid, ?int $datemin = null, ?int $datemax = null): array {
     global $DB;
 

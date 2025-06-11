@@ -23,14 +23,13 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once "$CFG->libdir/formslib.php";
+require_once("$CFG->libdir/formslib.php");
 
 /**
  * Extends the form.
  *
  */
-class dexpmod_form extends moodleform
-{
+class dexpmod_form extends moodleform {
     /**
      * Add elements to the form.
      *
@@ -77,7 +76,7 @@ class dexpmod_form extends moodleform
             $mform->addGroup($group, 'formgroup', '', ' ', false);
             $mform->hideIf('formgroup', 'datedependence', 'eq', '1');
         }
-        $mform->addElement('date_time_selector', 'date_min',get_string('date_min', 'local_dexpmod'));
+        $mform->addElement('date_time_selector', 'date_min', get_string('date_min', 'local_dexpmod'));
         $mform->hideif('date_min', 'datedependence', 'eq', '0');
         $mform->addElement('date_time_selector', 'date_max', get_string('date_max', 'local_dexpmod'));
         $mform->hideif('date_max', 'datedependence', 'eq', '0');
