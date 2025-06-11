@@ -25,13 +25,13 @@
 /**
  * Extends the navigation.
  *
- * @param $settingsnav      Settings
- * @param int $context      Context
+ * @param settings_navigation $settingsnav
+ * @param navigation_node $navref
  *
- * @return
+ * @return void
  */
-function local_dexpmod_extend_settings_navigation($settingsnav, $context) {
-    global $CFG, $PAGE;
+function local_dexpmod_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $navref): void {
+    global $PAGE;
 
     // Only add this settings item on non-site course pages.
     if (!$PAGE->course or $PAGE->course->id == 1) {
@@ -63,9 +63,9 @@ function local_dexpmod_extend_settings_navigation($settingsnav, $context) {
 /**
  * Returns the activities with completion set in current course.
  *
- * @param int    $courseID   ID of the course
- * @param int    $config     The block instance configuration
- * @param string $forceOrder An override for the course order setting
+ * @param int       $courseID   ID of the course
+ * @param ?int      $config     The block instance configuration
+ * @param ?string   $forceOrder An override for the course order setting
  *
  * @return array Activities with completion settings in the course
  */
@@ -115,16 +115,19 @@ function local_dexpmod_get_activities(int $courseID, ?int $config = null, ?strin
 
 /**
  * Moves the chosen activities and returns a list of these activities.
- * @param array    $data  form data
+ *
+ * @param int       $courseid
+ * @param array     $data  form data
  *
  * @return array table of activities
  */
-function move_activities($courseID, $data):array {
+function move_activities(int $courseid, array $data): array {
     global $DB;
+
     //Get all activities in the course.
-    $activities = local_dexpmod_get_activities($courseID, null, 'orderbycourse');
+    $activities = local_dexpmod_get_activities($courseid, null, 'orderbycourse');
     $addduration = $data->timeduration;
-    $sqlparams = ['course' => $courseID];
+    $sqlparams = ['course' => $courseid];
     $expectedarray = $DB->get_records('course_modules', $sqlparams);
     $table = new html_table();
     $table->head = ['Aktivität', 'Abschlusstermin'];
@@ -186,12 +189,12 @@ function move_activities($courseID, $data):array {
  * Returns the activities with completion set in current course.
  *
  * @param int courseID      Course ID
- * @param int dateMin       Minimum date
- * @param int dateMax       Maximum date
+ * @param ?int dateMin       Minimum date
+ * @param ?int dateMax       Maximum date
  *
  * @return array            Table of activities
  */
-function list_all_activities(int $courseID, ?int $dateMin = null, ?int $dateMax = bnull):array {
+function list_all_activities(int $courseID, ?int $dateMin = null, ?int $dateMax = bnull): array {
     global $DB;
     //Standard values without submitting the form
 
