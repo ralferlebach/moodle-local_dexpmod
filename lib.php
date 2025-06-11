@@ -22,10 +22,16 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-function local_dexpmod_extend_settings_navigation($settingsnav, $context)
-{
+// defined('MOODLE_INTERNAL') || die();
+/**
+ * Extends the navigation.
+ *
+ * @param $settingsnav      Settings
+ * @param int $context      Context
+ *
+ * @return
+ */
+function local_dexpmod_extend_settings_navigation($settingsnav, $context) {
     global $CFG, $PAGE;
 
     // Only add this settings item on non-site course pages.
@@ -77,8 +83,8 @@ function local_dexpmod_get_activities($courseid, $config = null, $forceorder = n
                     $config == null || (
                         !isset($config->activitiesincluded) || (
                             $config->activitiesincluded != 'selectedactivities' ||
-                                !empty($config->selectactivities) &&
-                                in_array($module.'-'.$cm->instance, $config->selectactivities))))
+                            !empty($config->selectactivities) &&
+                            in_array($module . '-' . $cm->instance, $config->selectactivities))))
             ) {
                 $activities[] = [
                     'type' => $module,
@@ -109,11 +115,10 @@ function local_dexpmod_get_activities($courseid, $config = null, $forceorder = n
     return $activities;
 }
 
-
-
 /**
  * Moves the chosen activities and returns a list of these activities.
- *  @param array    $data  form data
+ * @param array    $data  form data
+ *
  * @return array table of activities
  */
 function move_activities($courseID, $data)
